@@ -157,7 +157,7 @@ const Dashboard = () => {
           <button
             onClick={() =>
               setUpcomingPage((prev) =>
-                prev * contestsPerPage < filterContests(upcoming).length
+                prev * contestsPerPage < filterContests(upcoming)?.length
                   ? prev + 1
                   : prev
               )

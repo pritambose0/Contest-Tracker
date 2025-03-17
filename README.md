@@ -2,11 +2,12 @@
 
 A MERN stack-based web application that helps users track upcoming and past programming contests from platforms like **Codeforces, CodeChef, and LeetCode**. The app includes filtering, bookmarking, and solution attachment features.
 
+[🎥 Watch Demo Video](https://drive.google.com/file/d/1ZZ9gJ0bhIe87Efn14r4bUSo80pHsP0_V/view?usp=sharing)
+
 ## **✨ Features**
 - 🎯 **Contest Tracking**: Fetches upcoming and past contests from Codeforces, CodeChef, and LeetCode.
 - 🔍 **Filtering**: Allows users to filter contests by platform.
 - 📌 **Bookmarking**: Users can bookmark contests for quick access.
-- 📺 **Solution Links**: Users can attach YouTube solution links to past contests.
 - 🔑 **Admin Panel**: Admins can add solutions manually.
 - 🎁 **Bonus Features**:
   - 🔄 Auto-fetching of solution links
@@ -73,5 +74,4 @@ npm run dev
 
 ## **🤝 Contributing**
 Feel free to submit pull requests or open issues to improve the project.
-
 

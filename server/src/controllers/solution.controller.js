@@ -8,6 +8,7 @@ import axios from "axios";
 const PLAYLISTS = {
   Codeforces: process.env.CODEFORCES_PLAYLIST_ID,
   CodeChef: process.env.CODECHEF_PLAYLIST_ID,
+  LeetCode: process.env.LEETCODE_PLAYLIST_ID,
 };
 
 const addSolution = asyncHandler(async (req, res) => {
@@ -83,7 +84,10 @@ const fetchVideosFromPlaylist = async (playlistId) => {
 };
 
 const cleanVideoTitle = (title) => {
-  return title.split("|")[0].trim();
+  return title
+    .replace(/Leetcode|CodeChef|Codeforces/gi, "")
+    .split("|")[0]
+    .trim();
 };
 
 const updateSolutionLink = async (_, __) => {
@@ -115,6 +119,8 @@ const updateSolutionLink = async (_, __) => {
           contest: contest?._id,
           youtubeLink: `https://www.youtube.com/watch?v=${video.videoId}`,
         });
+
+        console.log(`Solution created for ${contest.name} on ${platform}`);
 
         if (!newSolution) {
           throw new ApiError(400, "Solution creation failed");

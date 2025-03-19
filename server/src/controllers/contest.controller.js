@@ -57,11 +57,78 @@ const fetchCodeChefContests = async () => {
   }
 };
 
+const fetchLeetCodeContests = async () => {
+  try {
+    const graphqlQuery = {
+      query: `
+        query {
+          allContests {
+            title
+            titleSlug
+            startTime
+            duration
+          }
+        }
+      `,
+    };
+
+    const response = await axios.post(
+      "https://leetcode.com/graphql",
+      JSON.stringify(graphqlQuery),
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (
+      !response.data ||
+      !response.data.data ||
+      !response.data.data.allContests
+    ) {
+      throw new Error("Invalid response from LeetCode API");
+    }
+
+    const allContests = response.data.data.allContests;
+    const now = Math.floor(Date.now() / 1000);
+
+    const upcomingContests = allContests
+      .filter((contest) => contest.startTime > now)
+      .map((contest) => ({
+        name: contest.title,
+        platform: "LeetCode",
+        startTime: new Date(contest.startTime * 1000).toISOString(),
+        duration: parseInt(contest.duration / 60),
+        url: `https://leetcode.com/contest/${contest.titleSlug}`,
+        status: "upcoming",
+      }));
+
+    const pastContests = allContests
+      .filter((contest) => contest.startTime <= now)
+      .map((contest) => ({
+        name: contest.title,
+        platform: "LeetCode",
+        startTime: new Date(contest.startTime * 1000).toISOString(),
+        duration: parseInt(contest.duration / 60),
+        url: `https://leetcode.com/contest/${contest.titleSlug}`,
+        status: "past",
+      }));
+
+    return [...upcomingContests, ...pastContests];
+  } catch (error) {
+    console.error(
+      "Error fetching LeetCode contests:",
+      error.response?.data || error.message
+    );
+    return [];
+  }
+};
+
 const retrieveContests = async (_, __) => {
   try {
     const results = await Promise.allSettled([
       fetchCodeforcesContests(),
       fetchCodeChefContests(),
+      fetchLeetCodeContests(),
     ]);
 
     const contests =

@@ -3,6 +3,7 @@ import {
   fetchUpcomingContests,
   fetchPastContests,
   logoutUser,
+  fetchBookmarkedContests,
 } from "../services/api";
 import ContestModal from "./ContestModal";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import ContestTable from "./ContestTable";
 import SkeletonLoader from "./SkeletonLoading";
 import { logout } from "../store/authSlice";
+import BookmarkModal from "./BookmarkModal";
 
 const Dashboard = () => {
   const [upcoming, setUpcoming] = useState([]);
@@ -19,6 +21,8 @@ const Dashboard = () => {
   const [selectedContest, setSelectedContest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [platformFilter, setPlatformFilter] = useState("All");
+  const [isBookmarkModalOpen, setBookmarkModalOpen] = useState(false);
+  const [bookmarks, setBookmarks] = useState([]);
 
   const userData = useSelector((state) => state.auth.userData);
   const userStatus = useSelector((state) => state.auth.status);
@@ -30,10 +34,11 @@ const Dashboard = () => {
     async function loadContests() {
       setUpcoming(await fetchUpcomingContests());
       setPast(await fetchPastContests());
+      setBookmarks(await fetchBookmarkedContests());
       setLoading(false);
     }
     loadContests();
-  }, []);
+  }, [isBookmarkModalOpen]);
 
   const contestsPerPage = 10;
   const filterContests = (contests) => {
@@ -59,6 +64,10 @@ const Dashboard = () => {
   };
   // console.log("Contests", upcoming);
 
+  const handleBookmarkClick = () => {
+    setBookmarkModalOpen(true);
+  };
+
   return loading ? (
     <div className="text-xl text-white w-full">
       <SkeletonLoader />
@@ -70,7 +79,7 @@ const Dashboard = () => {
       </h1>
 
       {/* Platform Filter */}
-      <div className="flex justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-4 sm:gap-0 mb-4">
         <select
           value={platformFilter}
           onChange={(e) => setPlatformFilter(e.target.value)}
@@ -83,21 +92,30 @@ const Dashboard = () => {
           ))}
         </select>
 
-        {userStatus ? (
+        <div className="flex gap-2">
           <button
-            className="bg-red-500 hover:bg-red-700 transition duration-300 text-white px-4 py-2 rounded cursor-pointer"
-            onClick={() => handleLogout()}
+            className="bg-yellow-500 hover:bg-yellow-600 transition duration-300 text-white px-4 py-2 rounded cursor-pointer"
+            onClick={handleBookmarkClick}
           >
-            Logout
+            Bookmarks
           </button>
-        ) : (
-          <button
-            className="bg-blue-500 hover:bg-blue-600 transition duration-300 text-white px-4 py-2 rounded cursor-pointer "
-            onClick={() => navigate("/login")}
-          >
-            Login
-          </button>
-        )}
+
+          {userStatus ? (
+            <button
+              className="bg-red-500 hover:bg-red-700 transition duration-300 text-white px-4 py-2 rounded cursor-pointer"
+              onClick={() => handleLogout()}
+            >
+              Logout
+            </button>
+          ) : (
+            <button
+              className="bg-blue-500 hover:bg-blue-600 transition duration-300 text-white px-4 py-2 rounded cursor-pointer "
+              onClick={() => navigate("/login")}
+            >
+              Login
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Upcoming Contests */}
@@ -228,6 +246,13 @@ const Dashboard = () => {
           contest={selectedContest}
           onClose={() => setSelectedContest(null)}
           isAdmin={isAdmin}
+        />
+      )}
+
+      {isBookmarkModalOpen && (
+        <BookmarkModal
+          bookmarks={bookmarks}
+          onClose={() => setBookmarkModalOpen(false)}
         />
       )}
     </div>

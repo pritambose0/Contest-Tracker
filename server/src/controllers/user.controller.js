@@ -78,7 +78,8 @@ const logoutUser = asyncHandler(async (_, res) => {
 
 const getAllBookmarks = asyncHandler(async (req, res) => {
   const { _id } = req.user;
-  const user = await UserSchema.findById(_id);
+  const user = await UserSchema.findById(_id).populate("bookmarks");
+
   return res
     .status(200)
     .json(

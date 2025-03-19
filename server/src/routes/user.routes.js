@@ -14,7 +14,7 @@ const router = Router();
 router.route("/").post(registerUser);
 router.route("/login").post(loginUser);
 router.route("/logout").post(verifyJWT, logoutUser);
-router.route("/:userId/bookmarks").get(verifyJWT, getAllBookmarks);
+router.route("/me/bookmarks").get(verifyJWT, getAllBookmarks);
 router.route("/current-user").get(verifyJWT, getCurrentUser);
 
 export default router;

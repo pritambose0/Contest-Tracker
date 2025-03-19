@@ -2,6 +2,13 @@ import { useEffect, useState } from "react";
 import { addSolution, getAllSolutions } from "../services/api";
 import { motion } from "framer-motion";
 
+const getYoutubeId = (url) => {
+  const match = url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/|.*embed\/|.*v%3D|.*vi=|vi\/))([^?&\n]+)/
+  );
+  return match ? match[1] : null;
+};
+
 const ContestModal = ({ contest, isAdmin, onClose }) => {
   const [solutionLink, setSolutionLink] = useState("");
   const [solutions, setSolutions] = useState(contest.solutions || []);
@@ -20,7 +27,6 @@ const ContestModal = ({ contest, isAdmin, onClose }) => {
       setSolutionLink("");
     }
   };
-  //   console.log("Solutions: ", solutions);
 
   return (
     <motion.div
@@ -28,7 +34,7 @@ const ContestModal = ({ contest, isAdmin, onClose }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <div className="bg-gray-900 text-white p-6 rounded-lg w-[90%] sm:w-1/2">
+      <div className="bg-gray-900 text-white p-6 rounded-lg w-[90%] sm:w-1/2 shadow-lg">
         <h2 className="text-xl font-bold">{contest.name}</h2>
         <p className="text-xl font-semibold text-green-400">
           {contest.platform}
@@ -59,20 +65,37 @@ const ContestModal = ({ contest, isAdmin, onClose }) => {
         {/* Solutions List */}
         <h3 className="mt-4 font-semibold">Solutions</h3>
         {solutions?.length > 0 ? (
-          <ul className="list-disc pl-4">
-            {solutions.map((sol, index) => (
-              <li key={index}>
-                <a
-                  href={sol.youtubeLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 underline"
+          <div className="grid gap-3 mt-2">
+            {solutions.map((sol, index) => {
+              const videoId = getYoutubeId(sol.youtubeLink);
+              return (
+                <div
+                  key={index}
+                  className="bg-gray-800 p-3 rounded-lg shadow-md"
                 >
-                  Solution {index + 1}
-                </a>
-              </li>
-            ))}
-          </ul>
+                  {videoId ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${videoId}`}
+                      title={`Solution ${index + 1}`}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="rounded aspect-video w-full"
+                    ></iframe>
+                  ) : (
+                    <a
+                      href={sol.youtubeLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 font-semibold hover:underline"
+                    >
+                      Solution {index + 1}
+                    </a>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         ) : (
           <p className="text-orange-400">No solutions added yet.</p>
         )}
